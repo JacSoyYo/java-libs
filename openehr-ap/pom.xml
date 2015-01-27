@@ -4,7 +4,7 @@
 	<parent>
 	<groupId>openehr</groupId>
 		<artifactId>ref_impl_java</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.0.11-SNAPSHOT</version>
 	</parent>
 	<artifactId>openehr-ap</artifactId>
 	<packaging>jar</packaging>
@@ -39,7 +39,6 @@
             <groupId>openehr</groupId>
             <artifactId>measure-serv</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
 			<groupId>commons-lang</groupId>

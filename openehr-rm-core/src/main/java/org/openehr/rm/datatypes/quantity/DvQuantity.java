@@ -26,8 +26,6 @@ import org.openehr.rm.support.measurement.SimpleMeasurementService;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -39,6 +37,9 @@ import java.util.List;
  * @version 1.0
  */
 public class DvQuantity extends DvAmount<DvQuantity> {
+
+
+    private static final long serialVersionUID = 8334654589100981576L;
 
     /**
      * Constructs a Quantity by all components
@@ -67,15 +68,15 @@ public class DvQuantity extends DvAmount<DvQuantity> {
                               @Attribute (name = "magnitude", required = true) double magnitude,
                               @Attribute (name = "precision") int precision,
                               @Attribute (name = "measurementService", system = true) MeasurementService measurementService) {
-        
-        super(otherReferenceRanges, normalRange, normalStatus, accuracy, 
+
+        super(otherReferenceRanges, normalRange, normalStatus, accuracy,
         		accuracyPercent, magnitudeStatus);
 
         if (precision < -1) {
             throw new IllegalArgumentException("negative precision");
         }
-        
-        
+
+
         /* Relaxed in order to create quantity without measurementService.
          * One possibility is to use the mixin class ExternalEnvironmentAccess
         if (StringUtils.isNotEmpty(units)
@@ -138,7 +139,7 @@ public class DvQuantity extends DvAmount<DvQuantity> {
 
     /**
      * New construct that does not require a measurementService
-     * 
+     *
      * @param units
      * @param magnitude
      * @param precision
@@ -167,20 +168,22 @@ public class DvQuantity extends DvAmount<DvQuantity> {
 
     /**
      * Units of this quantity
-     * 
+     *
      * @return units
      */
     public String getUnits() {
     	return units;
     }
-    
+
     public DvQuantity parse(String value) {
     	int i = value.indexOf(",");
-    	if(i < 0 || i == value.length()) {
-    		throw new IllegalArgumentException("failed to parse quantity, wrong format [" + value + "]");
-    	}
-    	String num = value.substring(0, i);
-    	String units = value.substring(i + 1);
+      String num = value;
+      String units = "";
+
+    	if(i >= 0) {
+        num = value.substring(0, i);
+        units = value.substring(i + 1);
+      }
     	int precision = 0;
     	i = num.indexOf(DECIMAL_SEPARATOR);
     	if(i >= 0) {
@@ -190,11 +193,11 @@ public class DvQuantity extends DvAmount<DvQuantity> {
     		double magnitude = Double.parseDouble(num);
     		return new DvQuantity(units, magnitude, precision);
     	} catch(NumberFormatException nfe) {
-    		throw new IllegalArgumentException("failed to parse quantity[" 
+    		throw new IllegalArgumentException("failed to parse quantity["
     					+ num + "]", nfe);
     	}
     }
-    
+
     /**
      * Sum of this quantity and another whose formal type must be the
      * difference type of this quantity.
@@ -207,8 +210,8 @@ public class DvQuantity extends DvAmount<DvQuantity> {
     public DvQuantified<DvQuantity> add(DvQuantified<DvQuantity> q) {
         DvQuantity qt = (DvQuantity) q;
         return new DvQuantity(getOtherReferenceRanges(), getNormalRange(),
-        		getNormalStatus(), 	getAccuracy(), isAccuracyPercent(), 
-        		getMagnitudeStatus(), getUnits(), magnitude + qt.magnitude, 
+        		getNormalStatus(), 	getAccuracy(), isAccuracyPercent(),
+        		getMagnitudeStatus(), getUnits(), magnitude + qt.magnitude,
         		precision, measurementService);
     }
 
@@ -224,8 +227,8 @@ public class DvQuantity extends DvAmount<DvQuantity> {
     public DvQuantified<DvQuantity> subtract(DvQuantified<DvQuantity> q) {
         DvQuantity qt = (DvQuantity) q;
         return new DvQuantity(getOtherReferenceRanges(), getNormalRange(),
-        		getNormalStatus(), getAccuracy(), isAccuracyPercent(), 
-        		getMagnitudeStatus(), getUnits(), magnitude - qt.magnitude, 
+        		getNormalStatus(), getAccuracy(), isAccuracyPercent(),
+        		getMagnitudeStatus(), getUnits(), magnitude - qt.magnitude,
         		precision, measurementService);
     }
 
@@ -247,8 +250,8 @@ public class DvQuantity extends DvAmount<DvQuantity> {
      * @return negated version
      */
     public DvQuantity negate() {
-        return new DvQuantity(getOtherReferenceRanges(), getNormalRange(), 
-        		getNormalStatus(), getAccuracy(), isAccuracyPercent(), 
+        return new DvQuantity(getOtherReferenceRanges(), getNormalRange(),
+        		getNormalStatus(), getAccuracy(), isAccuracyPercent(),
         		getMagnitudeStatus(), getUnits(), -magnitude,
                 precision, measurementService);
     }
@@ -345,19 +348,23 @@ public class DvQuantity extends DvAmount<DvQuantity> {
         this.magnitude = magnitude;
     }
 
+    public void setUnits(String units) {
+        this.units = units;
+    }
+
     public void setPrecision(int precision) {
         this.precision = precision;
-    }    
+    }
     // POJO end
 
     /* fields */
     private double magnitude; // add final
     private int precision;    // add final
-    private final String units;
+    private String units;
     private MeasurementService measurementService; // add final
-    
+
     public static final char DECIMAL_SEPARATOR = '.';
-    
+
 	@Override
 	public String getReferenceModelName() {
 		return ReferenceModelName.DV_QUANTITY.getName();

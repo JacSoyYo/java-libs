@@ -645,6 +645,11 @@ public class SkeletonGenerator {
 		} else if(cobj instanceof CDomainType) {
 		
 			return createDomainTypeObject((CDomainType) cobj, archetype);
+			
+		} else if(cobj instanceof ArchetypeInternalRef){
+			//fix for multiple events where the data attribute of the events is an InternalRef to the first event described 
+			return createArchetypeInternalRefObject((ArchetypeInternalRef) cobj, archetype,
+				   archetypeMap,extraValues, strategy);
 		
 		} else {
 			// TODO skip archetype_slot etc, log.warn?
@@ -652,6 +657,16 @@ public class SkeletonGenerator {
 		}
 	}
 	
+	//fix for multiple events where the data attribute of the events is an InternalRef to the first event described
+	private Object createArchetypeInternalRefObject(ArchetypeInternalRef cobj, Archetype archetype,
+		    Map<String, Archetype> archetypeMap, Map<String, Object> extraValues,
+		    GenerationStrategy strategy) throws Exception{
+		
+		CObject cobjRef = (CObject) archetype.node(cobj.getTargetPath());
+		
+		return createObject(cobjRef, archetype,archetypeMap, extraValues, strategy) ;
+	}
+
 	private Object createPrimitiveTypeObject(CPrimitiveObject cpo, Archetype archetype) 
 			throws Exception {
 		
